@@ -1,6 +1,6 @@
 # sparkit
 
-###Installation
+##Installation
 1. Install [Python](https://www.python.org/downloads/). 
 	- I used the latest at the time which was 3.6.1
 2. Go to the [PRAW GitHub](https://github.com/praw-dev/praw) to see its readme on how to install.
