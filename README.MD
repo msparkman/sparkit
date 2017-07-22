@@ -22,5 +22,6 @@
 		# Variables
 		subreddit='all'
 		searchPhrase='trump'
+		hoursAgo=1
 	```
 	- You will need to replace the text in the quotes with your respective credentials.

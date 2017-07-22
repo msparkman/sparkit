@@ -1,12 +1,12 @@
-import datetime
+from datetime import datetime, timedelta
 import praw
 import properties
 import pytz
 import smtplib
 
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login(properties.from_email, properties.from_pass)
+emailServer = smtplib.SMTP('smtp.gmail.com', 587)
+emailServer.starttls()
+emailServer.login(properties.from_email, properties.from_pass)
 
 reddit = praw.Reddit(client_id=properties.client_id,
 					 client_secret=properties.client_secret,
@@ -15,12 +15,21 @@ reddit = praw.Reddit(client_id=properties.client_id,
 subreddit = reddit.subreddit(properties.subreddit)
 print("Currently searching r/" + subreddit.display_name + " for \"" + properties.searchPhrase + "\"")
 
+submissions = subreddit.new(limit=100)
+
+# This should filter out submissions from before the time threshold
+timeThreshold = datetime.utcnow() - timedelta(hours=properties.hoursAgo)
+submissionList = [
+	x for x in submissions
+	if (datetime.utcfromtimestamp(x.created_utc) >= timeThreshold)
+]
+
 emailMessage = ""
-for submission in subreddit.hot(limit=10):
+for submission in submissionList:
 	title = submission.title
 
 	if properties.searchPhrase in title.lower():
-		postDateTime = datetime.datetime.fromtimestamp(submission.created_utc)
+		postDateTime = datetime.fromtimestamp(submission.created_utc)
 		submissionMessage = submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
 		print(submissionMessage)
 
@@ -28,8 +37,8 @@ for submission in subreddit.hot(limit=10):
 
 if (emailMessage != ""):
 	try:
-		server.sendmail(properties.from_email, properties.to_email, emailMessage)
+		emailServer.sendmail(properties.from_email, properties.to_email, emailMessage)
 	except:
 		print("Failed to send email")
 
-server.quit()
+emailServer.quit()
