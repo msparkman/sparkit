@@ -1,4 +1,5 @@
 # sparkit
+### This script is designed to look in a specific subreddit for a word/phrase and send out a notification if any submissions that match are found.
 
 ## Installation
 1. Install [Python](https://www.python.org/downloads/). 
