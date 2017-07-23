@@ -1,8 +1,10 @@
-from datetime import datetime, timedelta
 import praw
 import properties
 import pytz
 import smtplib
+
+from datetime import datetime, timedelta
+from email.mime.text import MIMEText
 
 emailServer = smtplib.SMTP('smtp.gmail.com', 587)
 emailServer.starttls()
@@ -36,8 +38,15 @@ for submission in submissionList:
 		emailMessage += "\n" + submissionMessage
 
 if (emailMessage != ""):
+	fromEmail = properties.from_email
+	toEmail = properties.to_email
+
+	msg = MIMEText(emailMessage, _charset="UTF-8")
+	msg['Subject'] = "Subreddit (" + properties.subreddit + ") Information"
+	msg['From'] = fromEmail
+	msg['To'] = toEmail
 	try:
-		emailServer.sendmail(properties.from_email, properties.to_email, emailMessage)
+		emailServer.sendmail(fromEmail, toEmail, msg.as_string())
 	except:
 		print("Failed to send email")
 

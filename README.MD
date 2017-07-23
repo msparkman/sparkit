@@ -25,3 +25,8 @@
 		hoursAgo=1
 	```
 	- You will need to replace the text in the quotes with your respective credentials.
+5. (Optional) Add a scheduled task via schtasks in Windows to run the script at a given interval:
+	- In a windows terminal (Command Prompt, cmder, etc), type the following:
+		`schtasks /Create /SC HOURLY /TN SparkitTask /TR "<python.exe path> <script path>"`
+	- You can replace HOURLY with the other acceptable Task Scheduler intervals.
+	- NOTE: When I first executed this schtasks command, it added the task successfully (you can check the active tasks in Task Scheduler) and showed that it would run every hour after the initial trigger time, but it didn't seem to run when the task was created. I ended up editing the task to start a few minutes later and it ran just fine.
