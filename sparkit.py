@@ -32,7 +32,7 @@ for submission in submissionList:
 
 	if properties.searchPhrase in title.lower():
 		postDateTime = datetime.fromtimestamp(submission.created_utc)
-		submissionMessage = submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
+		submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
 		print(submissionMessage)
 
 		emailMessage += "\n" + submissionMessage
