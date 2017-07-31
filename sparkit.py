@@ -32,16 +32,16 @@ for submission in submissionList:
 
 	if properties.searchPhrase in title.lower():
 		postDateTime = datetime.fromtimestamp(submission.created_utc)
-		submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
-		print(submissionMessage)
+		print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
 
-		emailMessage += "\n" + submissionMessage
+		submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
+		emailMessage += "<br />" + submissionMessage
 
 if (emailMessage != ""):
 	fromEmail = properties.from_email
 	toEmail = properties.to_email
 
-	msg = MIMEText(emailMessage, _charset="UTF-8")
+	msg = MIMEText(emailMessage, _subtype="html", _charset="UTF-8")
 	msg['Subject'] = "Subreddit (" + properties.subreddit + ") Information"
 	msg['From'] = fromEmail
 	msg['To'] = toEmail
