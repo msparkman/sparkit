@@ -22,8 +22,8 @@ submissions = subreddit.new(limit=100)
 # This should filter out submissions from before the time threshold
 timeThreshold = datetime.utcnow() - timedelta(hours=properties.hoursAgo)
 submissionList = [
-	x for x in submissions
-	if (datetime.utcfromtimestamp(x.created_utc) >= timeThreshold)
+	submission for submission in submissions
+	if (datetime.utcfromtimestamp(submission.created_utc) >= timeThreshold)
 ]
 
 emailMessage = ""
@@ -31,11 +31,13 @@ for submission in submissionList:
 	title = submission.title
 
 	for searchPhrase in properties.searchPhrases:
-		if searchPhrase.lower() in title.lower():
-			postDateTime = datetime.fromtimestamp(submission.created_utc)
+		# Keep a hashset of submissions found to avoid duplicate rows in the email
+		submissionSet = {}
 
-			# To get this to print during a cronjob, use this line instead
-			#print(submission.title.encode('utf-8') + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+		if searchPhrase.lower() in title.lower() and submission.id not in submissionSet:
+			submissionSet.add(submission.id)
+
+			postDateTime = datetime.fromtimestamp(submission.created_utc)
 			print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
 
 			submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")

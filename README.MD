@@ -1,5 +1,5 @@
 # sparkit
-### This script is designed to look in a specific subreddit for a word/phrase and send out a notification if any submissions that match are found.
+### This script is designed to look in a specific subreddit for a each word/phrase from a list and send out a notification if any submissions that match are found.
 
 ## Installation
 1. Install [Python](https://www.python.org/downloads/). 
@@ -21,7 +21,9 @@
 
 		# Variables
 		subreddit='all'
-		searchPhrase='trump'
+		searchPhrases= [
+			'trump'
+		]
 		hoursAgo=1
 	```
 	- You will need to replace the text in the quotes with your respective credentials.
@@ -35,3 +37,9 @@
 		- Edit the cronjobs via `crontab -e`
 		- Add a line with the following: `0 * * * * <python path> <sparkit directory>/sparkit.py`
 		- This will run at the bottom of every hour
+
+## Troubleshooting
+1. Error printing output in a cronjob
+	- When running this script from a cronjob and still want the print statements to be used, you might encounter an error from a submission title containing a utf-8 character. You'll need to change the line that prints the found submission to be:
+		`print(submission.title.encode('utf-8') + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))`
+	- I noticed this issue when running my script from an aws ec2 instance but only when it ran automatically from a cronjob. If I ran the script manually to output the same submission matches, the error wouldn't occur. Also, the above fix seemed to blow up when I ran this script manually in windows which is why I am removing it from the source. I usually comment out the print statement when the script is running in the background anyways.
