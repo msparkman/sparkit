@@ -32,10 +32,10 @@ for submission in submissionList:
 
 	for searchPhrase in properties.searchPhrases:
 		# Keep a hashset of submissions found to avoid duplicate rows in the email
-		submissionSet = {}
+		submissionList = []
 
-		if searchPhrase.lower() in title.lower() and submission.id not in submissionSet:
-			submissionSet.add(submission.id)
+		if searchPhrase.lower() in title.lower() and submission.id not in submissionList:
+			submissionList.append(submission.id)
 
 			postDateTime = datetime.fromtimestamp(submission.created_utc)
 			print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
