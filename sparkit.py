@@ -15,7 +15,7 @@ reddit = praw.Reddit(client_id=properties.client_id,
 					 user_agent=properties.user_agent)
 
 subreddit = reddit.subreddit(properties.subreddit)
-print("Currently searching r/" + subreddit.display_name + " for \"" + properties.searchPhrase + "\"")
+print("Currently searching r/" + subreddit.display_name + " for \"" + ",".join(properties.searchPhrases) + "\"")
 
 submissions = subreddit.new(limit=100)
 
@@ -30,12 +30,16 @@ emailMessage = ""
 for submission in submissionList:
 	title = submission.title
 
-	if properties.searchPhrase in title.lower():
-		postDateTime = datetime.fromtimestamp(submission.created_utc)
-		print(submission.title.encode('utf-8') + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+	for searchPhrase in properties.searchPhrases:
+		if searchPhrase.lower() in title.lower():
+			postDateTime = datetime.fromtimestamp(submission.created_utc)
 
-		submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
-		emailMessage += "<br />" + submissionMessage
+			# To get this to print during a cronjob, use this line instead
+			#print(submission.title.encode('utf-8') + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+			print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+
+			submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
+			emailMessage += "<br />" + submissionMessage
 
 if (emailMessage != ""):
 	fromEmail = properties.from_email
