@@ -14,41 +14,52 @@ reddit = praw.Reddit(client_id=properties.client_id,
 					 client_secret=properties.client_secret,
 					 user_agent=properties.user_agent)
 
-subreddit = reddit.subreddit(properties.subreddit)
-print("Currently searching r/" + subreddit.display_name + " for \"" + ",".join(properties.searchPhrases) + "\"")
-
-submissions = subreddit.new(limit=100)
-
-# This should filter out submissions from before the time threshold
-timeThreshold = datetime.utcnow() - timedelta(hours=properties.hoursAgo)
-submissionList = [
-	submission for submission in submissions
-	if (datetime.utcfromtimestamp(submission.created_utc) >= timeThreshold)
-]
-
+subredditSearches = properties.subredditSearches
 emailMessage = ""
-for submission in submissionList:
-	title = submission.title
+for subredditToSearch in subredditSearches:
+	subreddit = reddit.subreddit(subredditToSearch)
+	searchPhrases = subredditSearches[subredditToSearch]
+	subredditDisplayName = subreddit.display_name
 
-	for searchPhrase in properties.searchPhrases:
-		# Keep a hashset of submissions found to avoid duplicate rows in the email
-		submissionList = []
+	searchPhrasesString = ",".join(searchPhrases)
+	print("Currently searching r/" + subredditDisplayName + " for \"" + searchPhrasesString + "\"")
 
-		if searchPhrase.lower() in title.lower() and submission.id not in submissionList:
-			submissionList.append(submission.id)
+	submissions = subreddit.new(limit=100)
 
-			postDateTime = datetime.fromtimestamp(submission.created_utc)
-			print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+	# This should filter out submissions from before the time threshold
+	timeThreshold = datetime.utcnow() - timedelta(hours=properties.hoursAgo)
+	submissionList = [
+		submission for submission in submissions
+		if (datetime.utcfromtimestamp(submission.created_utc) >= timeThreshold)
+	]
 
-			submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
-			emailMessage += "<br />" + submissionMessage
+	if len(submissionList) < 1:
+		continue
+	
+	emailMessage += "<h3>Submissions found in r/" + subredditDisplayName + " for the search phrases (" + searchPhrasesString + "):</h3>"
+
+	for submission in submissionList:
+		title = submission.title
+
+		for searchPhrase in searchPhrases:
+			# Keep a hashset of submissions found to avoid duplicate rows in the email
+			submissionList = []
+
+			if searchPhrase.lower() in title.lower() and submission.id not in submissionList:
+				submissionList.append(submission.id)
+
+				postDateTime = datetime.fromtimestamp(submission.created_utc)
+				print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
+
+				submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
+				emailMessage += submissionMessage + "<br /><br />"
 
 if (emailMessage != ""):
 	fromEmail = properties.from_email
 	toEmail = properties.to_email
 
 	msg = MIMEText(emailMessage, _subtype="html", _charset="UTF-8")
-	msg['Subject'] = "Subreddit (" + properties.subreddit + ") Information"
+	msg['Subject'] = "Subreddit Search Information"
 	msg['From'] = fromEmail
 	msg['To'] = toEmail
 	try:

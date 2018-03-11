@@ -20,13 +20,21 @@
 		to_email='to@email.com'
 
 		# Variables
-		subreddit='all'
-		searchPhrases= [
-			'trump'
-		]
+		subredditSearches = {
+			'motorcycles': [
+				'suzuki',
+				'sv1000s'
+			],
+			'bikesgonewild': [
+				'track',
+				'summer',
+				'race'
+			]
+		}
 		hoursAgo=1
 	```
-	- You will need to replace the text in the quotes with your respective credentials.
+	- You will need to replace the text in the quotes above the Variables with your respective credentials.
+	- You should replace 'motorcycles'/'bikesgonewild' with the subreddits you want to search and the listed text beneath each one with whatever phrases you want to search for.
 5. (Optional) Schedule the script to run automatically:
 	1. Windows: Add a scheduled task via schtasks
 		- In a windows terminal (Command Prompt, cmder, etc), type the following:
