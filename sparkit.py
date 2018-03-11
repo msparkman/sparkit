@@ -21,7 +21,8 @@ for subredditToSearch in subredditSearches:
 	searchPhrases = subredditSearches[subredditToSearch]
 	subredditDisplayName = subreddit.display_name
 
-	print("Currently searching r/" + subredditDisplayName + " for \"" + ",".join(searchPhrases) + "\"")
+	searchPhrasesString = ",".join(searchPhrases)
+	print("Currently searching r/" + subredditDisplayName + " for \"" + searchPhrasesString + "\"")
 
 	submissions = subreddit.new(limit=100)
 
@@ -35,7 +36,7 @@ for subredditToSearch in subredditSearches:
 	if len(submissionList) < 1:
 		continue
 	
-	emailMessage += "<h3 font-weight=\"bold\">Submissions found in r/" + subredditDisplayName + " for the search phrases (" + ",".join(searchPhrases) + "):</h3>"
+	emailMessage += "<h3>Submissions found in r/" + subredditDisplayName + " for the search phrases (" + searchPhrasesString + "):</h3>"
 
 	for submission in submissionList:
 		title = submission.title
@@ -63,7 +64,6 @@ if (emailMessage != ""):
 	msg['To'] = toEmail
 	try:
 		emailServer.sendmail(fromEmail, toEmail, msg.as_string())
-		#print("\n" + emailMessage)
 	except:
 		print("Failed to send email")
 
