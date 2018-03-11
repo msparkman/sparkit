@@ -36,7 +36,8 @@ for subredditToSearch in subredditSearches:
 	if len(submissionList) < 1:
 		continue
 	
-	emailMessage += "<h3>Submissions found in r/" + subredditDisplayName + " for the search phrases (" + searchPhrasesString + "):</h3>"
+	submissionsFound = False
+	subredditMessage = "<h3>Submissions found in r/" + subredditDisplayName + " for the search phrases (" + searchPhrasesString + "):</h3>"
 
 	for submission in submissionList:
 		title = submission.title
@@ -46,13 +47,20 @@ for subredditToSearch in subredditSearches:
 			submissionList = []
 
 			if searchPhrase.lower() in title.lower() and submission.id not in submissionList:
+				submissionsFound = True
 				submissionList.append(submission.id)
 
 				postDateTime = datetime.fromtimestamp(submission.created_utc)
 				print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
 
 				submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
-				emailMessage += submissionMessage + "<br /><br />"
+				subredditMessage += submissionMessage + "<br /><br />"
+
+	# Skip this subreddit since no submission matches were found
+	if not submissionsFound:
+		continue
+
+	emailMessage += subredditMessage
 
 if (emailMessage != ""):
 	fromEmail = properties.from_email
