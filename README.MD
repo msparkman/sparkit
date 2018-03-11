@@ -20,10 +20,17 @@
 		to_email='to@email.com'
 
 		# Variables
-		subreddit='all'
-		searchPhrases= [
-			'trump'
-		]
+		subredditSearches = {
+			'motorcycles': [
+				'suzuki',
+				'sv1000s'
+			],
+			'bikesgonewild': [
+				'track',
+				'summer',
+				'race'
+			]
+		}
 		hoursAgo=1
 	```
 	- You will need to replace the text in the quotes with your respective credentials.

@@ -14,10 +14,14 @@ reddit = praw.Reddit(client_id=properties.client_id,
 					 client_secret=properties.client_secret,
 					 user_agent=properties.user_agent)
 
+subredditSearches = properties.subredditSearches
 emailMessage = ""
-for subreddit in properties.subredditList:
-	subreddit = reddit.subreddit(properties.subreddit)
-	print("Currently searching r/" + subreddit.display_name + " for \"" + ",".join(properties.searchPhrases) + "\"")
+for subredditToSearch in subredditSearches:
+	subreddit = reddit.subreddit(subredditToSearch)
+	searchPhrases = subredditSearches[subredditToSearch]
+	subredditDisplayName = subreddit.display_name
+
+	print("Currently searching r/" + subredditDisplayName + " for \"" + ",".join(searchPhrases) + "\"")
 
 	submissions = subreddit.new(limit=100)
 
@@ -30,25 +34,13 @@ for subreddit in properties.subredditList:
 
 	if len(submissionList) < 1:
 		continue
-
-	'''
-	Try to use a map of subreddits to their specific search criteria
-	subredditSearches = {
-		'motorcycles': [
-			'honda'
-		],
-		'politics': [
-			'trump'
-		]
-	}
-	'''
-
-	emailMessage += "Submissions found for r/" + subreddit + ":<br /> "
+	
+	emailMessage += "<h3 font-weight=\"bold\">Submissions found in r/" + subredditDisplayName + " for the search phrases (" + ",".join(searchPhrases) + "):</h3>"
 
 	for submission in submissionList:
 		title = submission.title
 
-		for searchPhrase in properties.searchPhrases:
+		for searchPhrase in searchPhrases:
 			# Keep a hashset of submissions found to avoid duplicate rows in the email
 			submissionList = []
 
@@ -59,18 +51,19 @@ for subreddit in properties.subredditList:
 				print(submission.title + " | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p"))
 
 				submissionMessage = "<a href=\"" + submission.shortlink + "\">" + submission.title + "</a> | " + postDateTime.strftime("%a %b %d %Y %I:%M:%S %p")
-				emailMessage += "<br />" + submissionMessage
+				emailMessage += submissionMessage + "<br /><br />"
 
 if (emailMessage != ""):
 	fromEmail = properties.from_email
 	toEmail = properties.to_email
 
 	msg = MIMEText(emailMessage, _subtype="html", _charset="UTF-8")
-	msg['Subject'] = "Subreddit (" + properties.subreddit + ") Information"
+	msg['Subject'] = "Subreddit Search Information"
 	msg['From'] = fromEmail
 	msg['To'] = toEmail
 	try:
 		emailServer.sendmail(fromEmail, toEmail, msg.as_string())
+		#print("\n" + emailMessage)
 	except:
 		print("Failed to send email")
 
